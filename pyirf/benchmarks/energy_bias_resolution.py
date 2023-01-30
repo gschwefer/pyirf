@@ -54,7 +54,8 @@ def inter_quantile_distance(rel_error):
 def energy_bias_resolution(
     events,
     energy_bins,
-    energy_type="true",
+    reco_energy_name="reco_energy",
+    true_energy_abscissa=True,
     bias_function=np.median,
     resolution_function=inter_quantile_distance,
 ):
@@ -67,9 +68,12 @@ def energy_bias_resolution(
         Astropy Table object containing the reconstructed events information.
     energy_bins: numpy.ndarray(dtype=float, ndim=1)
         Bin edges in energy.
-    energy_type: str
-        Either "true" or "reco" energy.
-        Default is "true".
+    reco_energy_name: string
+        Name of the column of the events QTable that contains the reconstructed energy.
+        Default is ``reco_energy``.
+    true_energy_abscissa: bool
+        If True, the resolution and bias are calculated as a function of true enery, else of reco_energy_name
+        Default is True
     bias_function: callable
         Function used to calculate the energy bias
     resolution_function: callable
@@ -83,10 +87,13 @@ def energy_bias_resolution(
     """
 
     # create a table to make use of groupby operations
-    table = QTable(events[["true_energy", "reco_energy"]], copy=False)
-    table["rel_error"] = (events["reco_energy"] / events["true_energy"]).to_value(u.one) - 1
+    table = QTable(events[["true_energy", reco_energy_name]], copy=False)
+    table["rel_error"] = (events[reco_energy_name] / events["true_energy"]).to_value(u.one) - 1
 
-    energy_key = f"{energy_type}_energy"
+    if true_energy_abscissa:
+        energy_key = "true_energy"
+    else:
+        energy_key=reco_energy_name
 
     result = QTable()
     result[f"{energy_key}_low"] = energy_bins[:-1]
