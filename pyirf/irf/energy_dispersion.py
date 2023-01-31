@@ -28,7 +28,7 @@ def _normalize_hist(hist):
 
 
 def energy_dispersion(
-    selected_events, true_energy_bins, fov_offset_bins, migration_bins, reco_energy_name="reco_energy"
+    selected_events, true_energy_bins, fov_offset_bins, migration_bins, reco_energy_name="reco"
 ):
     """
     Calculate energy dispersion for the given DL2 event list.
@@ -50,14 +50,17 @@ def energy_dispersion(
         For Point-Like IRFs, only giving a single bin is appropriate.
     reco_energy_name: string
         Name of the column of selected_events that contains the reconstructed energy.
-        Default is ``reco_energy``.
+        Default is ``reco``.
     Returns
     -------
     energy_dispersion: numpy.ndarray
         Energy dispersion matrix
         with shape (n_true_energy_bins, n_migration_bins, n_fov_ofset_bins)
     """
-    mu = (selected_events[reco_energy_name] / selected_events["true_energy"]).to_value(
+
+    reco_energy_key=f"{reco_energy_name}_energy"
+
+    mu = (selected_events[reco_energy_key] / selected_events["true_energy"]).to_value(
         u.one
     )
 

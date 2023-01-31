@@ -4,13 +4,14 @@ from scipy.stats import norm
 import astropy.units as u
 
 from ..binning import calculate_bin_indices
+from ..utils import calculate_theta_per_event
 
 
 ONE_SIGMA_QUANTILE = norm.cdf(1) - norm.cdf(-1)
 
 
 def angular_resolution(
-    events, energy_bins, energy_type="true",
+    events, energy_bins, energy_type="true", reco_name="reco"
 ):
     """
     Calculate the angular resolution.
@@ -25,8 +26,11 @@ def angular_resolution(
     energy_bins: numpy.ndarray(dtype=float, ndim=1)
         Bin edges in energy.
     energy_type: str
-        Either "true" or "reco" energy.
+        Either "true" or some "reco" energy.
         Default is "true".
+    reco_name: str
+        Name of the key in events QTable containing the reconstructed az and alt values
+
 
     Returns
     -------
@@ -36,7 +40,9 @@ def angular_resolution(
     """
     # create a table to make use of groupby operations
     energy_key = f"{energy_type}_energy"
-    table = QTable(events[[energy_key, "theta"]])
+    table=QTable()
+    table[energy_key]=events[energy_key]
+    table["theta"]=calculate_theta_per_event(events,reco_key=reco_name)
 
     bin_index, valid = calculate_bin_indices(table[energy_key], energy_bins)
 

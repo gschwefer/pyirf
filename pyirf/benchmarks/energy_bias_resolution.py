@@ -54,7 +54,7 @@ def inter_quantile_distance(rel_error):
 def energy_bias_resolution(
     events,
     energy_bins,
-    reco_energy_name="reco_energy",
+    reco_energy_name="reco",
     true_energy_abscissa=True,
     bias_function=np.median,
     resolution_function=inter_quantile_distance,
@@ -70,7 +70,7 @@ def energy_bias_resolution(
         Bin edges in energy.
     reco_energy_name: string
         Name of the column of the events QTable that contains the reconstructed energy.
-        Default is ``reco_energy``.
+        Default is ``reco``.
     true_energy_abscissa: bool
         If True, the resolution and bias are calculated as a function of true enery, else of reco_energy_name
         Default is True
@@ -86,14 +86,16 @@ def energy_bias_resolution(
         per each bin in true energy.
     """
 
+    reco_energy_key=f"{reco_energy_name}_energy"
+
     # create a table to make use of groupby operations
-    table = QTable(events[["true_energy", reco_energy_name]], copy=False)
-    table["rel_error"] = (events[reco_energy_name] / events["true_energy"]).to_value(u.one) - 1
+    table = QTable(events[["true_energy", reco_energy_key]], copy=False)
+    table["rel_error"] = (events[reco_energy_key] / events["true_energy"]).to_value(u.one) - 1
 
     if true_energy_abscissa:
         energy_key = "true_energy"
     else:
-        energy_key=reco_energy_name
+        energy_key=reco_energy_key
 
     result = QTable()
     result[f"{energy_key}_low"] = energy_bins[:-1]

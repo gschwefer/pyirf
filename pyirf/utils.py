@@ -59,6 +59,33 @@ def calculate_theta(events, assumed_source_az, assumed_source_alt):
 
     return theta.to(u.deg)
 
+def calculate_theta_per_event(events, true_key="true",reco_key="reco"):
+    """Calculate sky separation between true and reconstructed directions.
+
+    Parameters
+    ----------
+    events : astropy.QTable
+        Astropy Table object containing the reconstructed events information.
+    true_key: str
+        Name of the keys that contains the true alt and az values
+    reco_key: str
+        Name of the keys that contains the reconstructed alt and az values
+
+    Returns
+    -------
+    theta: astropy.units.Quantity
+        Angular separation between the true and reconstructed directions
+        in the sky.
+    """
+    theta = angular_separation(
+        events[f"{true_key}_az"],
+        events[f"{true_key}_alt"],
+        events[f"{reco_key}_az"],
+        events[f"{reco_key}_alt"],
+    )
+
+    return theta.to(u.deg)
+
 
 def calculate_source_fov_offset(events, prefix="true"):
     """Calculate angular separation between true and pointing positions.

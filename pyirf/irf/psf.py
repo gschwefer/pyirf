@@ -1,10 +1,10 @@
 import numpy as np
 import astropy.units as u
 
-from ..utils import cone_solid_angle
+from ..utils import cone_solid_angle, calculate_theta_per_event
 
 
-def psf_table(events, true_energy_bins, source_offset_bins, fov_offset_bins):
+def psf_table(events, true_energy_bins, source_offset_bins, fov_offset_bins,reco_name="reco"):
     """
     Calculate the table based PSF (radially symmetrical bins around the true source)
     """
@@ -13,7 +13,7 @@ def psf_table(events, true_energy_bins, source_offset_bins, fov_offset_bins):
         [
             events["true_energy"].to_value(u.TeV),
             events["true_source_fov_offset"].to_value(u.deg),
-            events["theta"].to_value(u.deg),
+            calculate_theta_per_event(events,reco_key=reco_name).to_value(u.deg),
         ]
     )
 
