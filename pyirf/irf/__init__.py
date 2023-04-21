@@ -5,7 +5,7 @@ from .effective_area import (
 )
 from .energy_dispersion import energy_dispersion
 from .psf import psf_table
-from .background import background_2d
+from .background import background_2d, BACKGROUND_UNIT
 
 __all__ = [
     "effective_area",
