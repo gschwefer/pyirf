@@ -5,7 +5,13 @@ except ImportError:
         "You need gammapy installed to use this module of pyirf"
     ) from None
 
-from gammapy.irf import EffectiveAreaTable2D, PSF3D, EnergyDispersion2D, Background2D
+from gammapy.irf import (
+    EffectiveAreaTable2D,
+    PSF3D,
+    EnergyDispersion2D,
+    Background2D,
+    BACKGROUND_UNIT,
+)
 from gammapy.maps import MapAxis
 import astropy.units as u
 
@@ -167,6 +173,5 @@ def create_background_2d(
     energy_axis_reco = _create_energy_axis_reco(reco_energy_bins)
 
     return Background2D(
-        axes=[energy_axis_reco, offset_axis],
-        data=background_2d,
+        axes=[energy_axis_reco, offset_axis], data=background_2d, unit=BACKGROUND_UNIT
     )
