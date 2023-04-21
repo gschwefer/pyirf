@@ -1,30 +1,36 @@
 try:
     import gammapy
 except ImportError:
-    raise ImportError('You need gammapy installed to use this module of pyirf') from None
+    raise ImportError(
+        "You need gammapy installed to use this module of pyirf"
+    ) from None
 
-from gammapy.irf import EffectiveAreaTable2D, PSF3D, EnergyDispersion2D
+from gammapy.irf import EffectiveAreaTable2D, PSF3D, EnergyDispersion2D, Background2D
 from gammapy.maps import MapAxis
 import astropy.units as u
-
 
 
 def _create_offset_axis(fov_offset_bins):
     return MapAxis.from_edges(fov_offset_bins, name="offset")
 
+
 def _create_energy_axis_true(true_energy_bins):
     return MapAxis.from_edges(true_energy_bins, name="energy_true")
 
 
+def _create_energy_axis_reco(reco_energy_bins):
+    return MapAxis.from_edges(reco_energy_bins, name="energy")
+
+
 @u.quantity_input(
-    effective_area=u.m ** 2, true_energy_bins=u.TeV, fov_offset_bins=u.deg
+    effective_area=u.m**2, true_energy_bins=u.TeV, fov_offset_bins=u.deg
 )
 def create_effective_area_table_2d(
     effective_area,
     true_energy_bins,
     fov_offset_bins,
 ):
-    '''
+    """
     Create a :py:class:`gammapy.irf.EffectiveAreaTable2D` from pyirf outputs.
 
     Parameters
@@ -41,20 +47,18 @@ def create_effective_area_table_2d(
     -------
     gammapy.irf.EffectiveAreaTable2D
     aeff2d: gammapy.irf.EffectiveAreaTable2D
-    '''
+    """
     offset_axis = _create_offset_axis(fov_offset_bins)
     energy_axis_true = _create_energy_axis_true(true_energy_bins)
 
     return EffectiveAreaTable2D(
-        axes = [energy_axis_true,
-                offset_axis],
+        axes=[energy_axis_true, offset_axis],
         data=effective_area,
     )
 
 
-
 @u.quantity_input(
-    psf=u.sr ** -1,
+    psf=u.sr**-1,
     true_energy_bins=u.TeV,
     source_offset_bins=u.deg,
     fov_offset_bins=u.deg,
@@ -87,18 +91,14 @@ def create_psf_3d(
     """
     offset_axis = _create_offset_axis(fov_offset_bins)
     energy_axis_true = _create_energy_axis_true(true_energy_bins)
-    rad_axis = MapAxis.from_edges(source_offset_bins, name='rad')
+    rad_axis = MapAxis.from_edges(source_offset_bins, name="rad")
 
-    return PSF3D(
-        axes = [energy_axis_true,
-                offset_axis,
-                rad_axis],
-        data = psf
-    )
+    return PSF3D(axes=[energy_axis_true, offset_axis, rad_axis], data=psf)
 
 
 @u.quantity_input(
-    true_energy_bins=u.TeV, fov_offset_bins=u.deg,
+    true_energy_bins=u.TeV,
+    fov_offset_bins=u.deg,
 )
 def create_energy_dispersion_2d(
     energy_dispersion,
@@ -131,8 +131,42 @@ def create_energy_dispersion_2d(
     migra_axis = MapAxis.from_edges(migration_bins, name="migra")
 
     return EnergyDispersion2D(
-        axes = [energy_axis_true,
-                migra_axis,
-                offset_axis],
-        data = energy_dispersion,
+        axes=[energy_axis_true, migra_axis, offset_axis],
+        data=energy_dispersion,
+    )
+
+
+@u.quantity_input(
+    reco_energy_bins=u.TeV,
+    fov_offset_bins=u.deg,
+)
+def create_background_2d(
+    background_2d,
+    reco_energy_bins,
+    fov_offset_bins,
+):
+    """
+    Create a :py:class:`gammapy.irf.Background2D` from pyirf outputs.
+
+    Parameters
+    ----------
+    background_2d: numpy.ndarray
+        2D background array, must have shape
+        (n_energy_bins, n_source_offset_bins)
+    reco_energy_bins: astropy.units.Quantity[energy]
+        Bin edges in reconstructed energy
+    fov_offset_bins: astropy.units.Quantity[angle]
+        Bin edges in the field of view offset.
+        For Point-Like IRFs, only giving a single bin is appropriate.
+
+    Returns
+    -------
+    background: gammapy.irf.Background2D
+    """
+    offset_axis = _create_offset_axis(fov_offset_bins)
+    energy_axis_reco = _create_energy_axis_reco(reco_energy_bins)
+
+    return Background2D(
+        axes=[energy_axis_reco, offset_axis],
+        data=background_2d,
     )
