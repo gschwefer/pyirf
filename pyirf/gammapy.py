@@ -10,8 +10,8 @@ from gammapy.irf import (
     PSF3D,
     EnergyDispersion2D,
     Background2D,
-    BACKGROUND_UNIT,
 )
+from .irf import BACKGROUND_UNIT
 from gammapy.maps import MapAxis
 import astropy.units as u
 
