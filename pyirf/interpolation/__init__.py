@@ -1,29 +1,61 @@
 """
-Collection of interpolation methods
+Collection of interpolation and extrapolation methods
 """
 
+from .base_extrapolators import (
+    BaseExtrapolator,
+    DiscretePDFExtrapolator,
+    ParametrizedExtrapolator,
+)
 from .base_interpolators import (
     BaseInterpolator,
-    BinnedInterpolator,
+    DiscretePDFInterpolator,
     ParametrizedInterpolator,
+    PDFNormalization,
+)
+from .component_estimators import (
+    BaseComponentEstimator,
+    DiscretePDFComponentEstimator,
+    EffectiveAreaEstimator,
+    EnergyDispersionEstimator,
+    ParametrizedComponentEstimator,
+    PSFTableEstimator,
+    RadMaxEstimator,
 )
 from .griddata_interpolator import GridDataInterpolator
-from .interpolate_irfs import (
-    interpolate_effective_area_per_energy_and_fov,
-    interpolate_energy_dispersion,
-    interpolate_psf_table,
-    interpolate_rad_max,
+from .moment_morph_interpolator import MomentMorphInterpolator
+from .nearest_neighbor_searcher import (
+    BaseNearestNeighborSearcher,
+    DiscretePDFNearestNeighborSearcher,
+    ParametrizedNearestNeighborSearcher,
+)
+from .nearest_simplex_extrapolator import (
+    MomentMorphNearestSimplexExtrapolator,
+    ParametrizedNearestSimplexExtrapolator,
 )
 from .quantile_interpolator import QuantileInterpolator
 
 __all__ = [
+    "BaseComponentEstimator",
     "BaseInterpolator",
-    "BinnedInterpolator",
+    "BaseNearestNeighborSearcher",
+    "BaseExtrapolator",
+    "PDFNormalization",
+    "DiscretePDFExtrapolator",
+    "ParametrizedExtrapolator",
+    "DiscretePDFComponentEstimator",
+    "DiscretePDFInterpolator",
+    "DiscretePDFNearestNeighborSearcher",
     "GridDataInterpolator",
+    "MomentMorphInterpolator",
+    "MomentMorphNearestSimplexExtrapolator",
+    "ParametrizedComponentEstimator",
     "ParametrizedInterpolator",
+    "ParametrizedNearestNeighborSearcher",
+    "ParametrizedNearestSimplexExtrapolator",
     "QuantileInterpolator",
-    "interpolate_effective_area_per_energy_and_fov",
-    "interpolate_energy_dispersion",
-    "interpolate_psf_table",
-    "interpolate_rad_max",
+    "EffectiveAreaEstimator",
+    "RadMaxEstimator",
+    "EnergyDispersionEstimator",
+    "PSFTableEstimator",
 ]

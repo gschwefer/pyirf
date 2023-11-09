@@ -13,7 +13,11 @@ from .utils import check_histograms, cone_solid_angle
 from .binning import create_histogram_table, bin_center
 
 
-__all__ = ["relative_sensitivity", "calculate_sensitivity"]
+__all__ = [
+    "relative_sensitivity",
+    "calculate_sensitivity",
+    "estimate_background",
+]
 
 
 log = logging.getLogger(__name__)
@@ -65,10 +69,6 @@ def _relative_sensitivity(
             "Could not calculate relative significance for"
             f" n_signal={n_signal:.1f}, n_off={n_off:.1f}, returning nan {e}"
         )
-        return np.nan
-
-    # less than min_sigma
-    if relative_flux > 1:
         return np.nan
 
     # scale to achieved flux level
@@ -250,8 +250,9 @@ def calculate_sensitivity(
         k = "reco_energy_" + key
         s[k] = signal_hist[k]
 
-    s["n_signal"] = signal_hist["n"] * rel_sens
-    s["n_signal_weighted"] = signal_hist["n_weighted"] * rel_sens
+    with np.errstate(invalid="ignore"):
+        s["n_signal"] = signal_hist["n"] * rel_sens
+        s["n_signal_weighted"] = signal_hist["n_weighted"] * rel_sens
     s["n_background"] = background_hist["n"]
     s["n_background_weighted"] = background_hist["n_weighted"]
 
