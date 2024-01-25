@@ -4,7 +4,7 @@ import astropy.units as u
 from ..utils import cone_solid_angle
 
 
-def psf_table(events, true_energy_bins, source_offset_bins, fov_offset_bins):
+def psf_table(events, true_energy_bins, source_offset_bins, fov_offset_bins,use_event_weights=True):
     """
     Calculate the table based PSF (radially symmetrical bins around the true source)
     """
@@ -17,6 +17,11 @@ def psf_table(events, true_energy_bins, source_offset_bins, fov_offset_bins):
         ]
     )
 
+    if use_event_weights:
+        event_weights=events["weight"]
+    else:
+        event_weights=np.ones(len(events))
+
     hist, _ = np.histogramdd(
         array,
         [
@@ -24,6 +29,7 @@ def psf_table(events, true_energy_bins, source_offset_bins, fov_offset_bins):
             fov_offset_bins.to_value(u.deg),
             source_offset_bins.to_value(u.deg),
         ],
+        weights=event_weights
     )
 
     psf = _normalize_psf(hist, source_offset_bins)

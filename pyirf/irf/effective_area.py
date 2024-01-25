@@ -27,7 +27,7 @@ def effective_area(n_selected, n_simulated, area):
     return (n_selected / n_simulated) * area
 
 
-def effective_area_per_energy(selected_events, simulation_info, true_energy_bins):
+def effective_area_per_energy(selected_events, simulation_info, true_energy_bins,use_event_weights=True):
     """
     Calculate effective area in bins of true energy.
 
@@ -47,11 +47,14 @@ def effective_area_per_energy(selected_events, simulation_info, true_energy_bins
     )
     hist_simulated = simulation_info.calculate_n_showers_per_energy(true_energy_bins)
 
-    return effective_area(hist_selected["n"], hist_simulated, area)
+    if use_event_weights:
+        return effective_area(hist_selected["n_weighted"], hist_simulated, area)
+    else:
+        return effective_area(hist_selected["n"], hist_simulated, area)
 
 
 def effective_area_per_energy_and_fov(
-    selected_events, simulation_info, true_energy_bins, fov_offset_bins
+    selected_events, simulation_info, true_energy_bins, fov_offset_bins,use_event_weights=True,
 ):
     """
     Calculate effective area in bins of true energy and field of view offset.
@@ -74,6 +77,10 @@ def effective_area_per_energy_and_fov(
     hist_simulated = simulation_info.calculate_n_showers_per_energy_and_fov(
         true_energy_bins, fov_offset_bins
     )
+    if use_event_weights:
+        event_weights=selected_events["weight"]
+    else:
+        event_weights=np.ones(len(selected_events))
 
     hist_selected, _, _ = np.histogram2d(
         selected_events["true_energy"].to_value(u.TeV),
@@ -82,6 +89,7 @@ def effective_area_per_energy_and_fov(
             true_energy_bins.to_value(u.TeV),
             fov_offset_bins.to_value(u.deg),
         ],
+        weights=event_weights
     )
 
     return effective_area(hist_selected, hist_simulated, area)

@@ -29,7 +29,7 @@ def _normalize_hist(hist, migration_bins):
 
 
 def energy_dispersion(
-    selected_events, true_energy_bins, fov_offset_bins, migration_bins,
+    selected_events, true_energy_bins, fov_offset_bins, migration_bins,use_event_weights=True
 ):
     """
     Calculate energy dispersion for the given DL2 event list.
@@ -60,6 +60,11 @@ def energy_dispersion(
         u.one
     )
 
+    if use_event_weights:
+        event_weights=selected_events["weight"]
+    else:
+        event_weights=np.ones(len(selected_events))
+
     energy_dispersion, _ = np.histogramdd(
         np.column_stack(
             [
@@ -73,6 +78,7 @@ def energy_dispersion(
             migration_bins,
             fov_offset_bins.to_value(u.deg),
         ],
+        weights=event_weights
     )
 
     energy_dispersion = _normalize_hist(energy_dispersion, migration_bins)
